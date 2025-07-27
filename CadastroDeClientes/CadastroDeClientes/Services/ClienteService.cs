@@ -7,9 +7,16 @@ public class ClienteService : IClienteService
 {
     private readonly IDatabaseService _databaseService;
 
+    public event EventHandler? ClientesChanged;
+
     public ClienteService(IDatabaseService databaseService)
     {
         _databaseService = databaseService;
+    }
+
+    private void OnClientesChanged()
+    {
+        ClientesChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public async Task<ObservableCollection<Cliente>> GetAllClientesAsync()
@@ -47,6 +54,10 @@ public class ClienteService : IClienteService
                 throw new ArgumentNullException(nameof(cliente));
 
             var result = await _databaseService.SaveClienteAsync(cliente);
+            if (result > 0)
+            {
+                OnClientesChanged();
+            }
             return result > 0;
         }
         catch (Exception ex)
@@ -63,6 +74,10 @@ public class ClienteService : IClienteService
                 throw new ArgumentNullException(nameof(cliente));
 
             var result = await _databaseService.SaveClienteAsync(cliente);
+            if (result > 0)
+            {
+                OnClientesChanged();
+            }
             return result > 0;
         }
         catch (Exception ex)
@@ -76,6 +91,10 @@ public class ClienteService : IClienteService
         try
         {
             var result = await _databaseService.DeleteClienteByIdAsync(id);
+            if (result > 0)
+            {
+                OnClientesChanged();
+            }
             return result > 0;
         }
         catch (Exception ex)

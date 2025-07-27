@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace CadastroDeClientes.ViewModels;
 
-public class MainPageViewModel : BaseViewModel
+public class MainPageViewModel : BaseViewModel, IDisposable
 {
     private readonly IClienteService _clienteService;
     private Cliente? _selectedCliente;
@@ -21,6 +21,9 @@ public class MainPageViewModel : BaseViewModel
         AlterarClienteCommand = new RelayCommand(async () => await AlterarCliente(), () => SelectedCliente != null);
         ExcluirClienteCommand = new RelayCommand(async () => await ExcluirCliente(), () => SelectedCliente != null);
         RefreshCommand = new RelayCommand(async () => await LoadClientes());
+        
+        // Inscrever-se no evento de mudanças de clientes
+        _clienteService.ClientesChanged += OnClientesChanged;
         
         _ = LoadClientes();
     }
@@ -66,6 +69,12 @@ public class MainPageViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    private async void OnClientesChanged(object? sender, EventArgs e)
+    {
+        // Atualizar a lista de clientes quando houver mudanças
+        await LoadClientes();
     }
 
     private async Task IncluirCliente()
@@ -126,5 +135,11 @@ public class MainPageViewModel : BaseViewModel
         {
             await Application.Current!.MainPage!.DisplayAlert("Erro", $"Erro ao excluir cliente: {ex.Message}", "OK");
         }
+    }
+
+    public void Dispose()
+    {
+        // Desinscrever do evento para evitar vazamentos de memória
+        _clienteService.ClientesChanged -= OnClientesChanged;
     }
 }
