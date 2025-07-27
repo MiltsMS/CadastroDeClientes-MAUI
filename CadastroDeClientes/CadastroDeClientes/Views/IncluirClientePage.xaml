@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CadastroDeClientes.Views.IncluirClientePage"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <Grid Padding="20" RowSpacing="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Cabeçalho -->
+            <Label Grid.Row="0"
+                   Text="Incluir Novo Cliente"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light=#2D3748, Dark=#F7FAFC}"
+                   Margin="0,0,0,20" />
+
+            <!-- Nome -->
+            <StackLayout Grid.Row="1">
+                <Label Text="Nome *"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#4A5568, Dark=#CBD5E0}" />
+                <Entry Text="{Binding Name}"
+                       Placeholder="Digite o nome"
+                       BackgroundColor="{AppThemeBinding Light=White, Dark=#2D3748}"
+                       TextColor="{AppThemeBinding Light=#2D3748, Dark=#F7FAFC}"
+                       PlaceholderColor="{AppThemeBinding Light=#A0AEC0, Dark=#718096}"
+                       HeightRequest="45" />
+            </StackLayout>
+
+            <!-- Sobrenome -->
+            <StackLayout Grid.Row="2">
+                <Label Text="Sobrenome *"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#4A5568, Dark=#CBD5E0}" />
+                <Entry Text="{Binding Lastname}"
+                       Placeholder="Digite o sobrenome"
+                       BackgroundColor="{AppThemeBinding Light=White, Dark=#2D3748}"
+                       TextColor="{AppThemeBinding Light=#2D3748, Dark=#F7FAFC}"
+                       PlaceholderColor="{AppThemeBinding Light=#A0AEC0, Dark=#718096}"
+                       HeightRequest="45" />
+            </StackLayout>
+
+            <!-- Idade -->
+            <StackLayout Grid.Row="3">
+                <Label Text="Idade *"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#4A5568, Dark=#CBD5E0}" />
+                <Entry Text="{Binding Age}"
+                       Placeholder="Digite a idade"
+                       Keyboard="Numeric"
+                       BackgroundColor="{AppThemeBinding Light=White, Dark=#2D3748}"
+                       TextColor="{AppThemeBinding Light=#2D3748, Dark=#F7FAFC}"
+                       PlaceholderColor="{AppThemeBinding Light=#A0AEC0, Dark=#718096}"
+                       HeightRequest="45" />
+            </StackLayout>
+
+            <!-- Endereço -->
+            <StackLayout Grid.Row="4">
+                <Label Text="Endereço *"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#4A5568, Dark=#CBD5E0}" />
+                <Editor Text="{Binding Address}"
+                        Placeholder="Digite o endereço completo"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#2D3748}"
+                        TextColor="{AppThemeBinding Light=#2D3748, Dark=#F7FAFC}"
+                        PlaceholderColor="{AppThemeBinding Light=#A0AEC0, Dark=#718096}"
+                        HeightRequest="80" />
+            </StackLayout>
+
+            <!-- Campos obrigatórios -->
+            <Label Grid.Row="5"
+                   Text="* Campos obrigatórios"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light=#718096, Dark=#A0AEC0}"
+                   HorizontalOptions="Start" />
+
+            <!-- Espaçador -->
+            <BoxView Grid.Row="6" />
+
+            <!-- Botões -->
+            <StackLayout Grid.Row="7"
+                         Orientation="Horizontal"
+                         HorizontalOptions="Center"
+                         Spacing="20">
+                
+                <Button Text="Salvar"
+                        Command="{Binding SalvarCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#28A745, Dark=#20C997}"
+                        TextColor="White"
+                        WidthRequest="120"
+                        HeightRequest="45"
+                        CornerRadius="8"
+                        FontAttributes="Bold" />
+                
+                <Button Text="Cancelar"
+                        Command="{Binding CancelarCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#6C757D, Dark=#495057}"
+                        TextColor="White"
+                        WidthRequest="120"
+                        HeightRequest="45"
+                        CornerRadius="8"
+                        FontAttributes="Bold" />
+            </StackLayout>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator Grid.RowSpan="8"
+                              IsVisible="{Binding IsBusy}"
+                              IsRunning="{Binding IsBusy}"
+                              Color="{AppThemeBinding Light=#007BFF, Dark=#0D6EFD}"
+                              Scale="1.5"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
