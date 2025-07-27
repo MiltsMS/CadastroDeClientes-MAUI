@@ -5,65 +5,82 @@ namespace CadastroDeClientes.Services;
 
 public class ClienteService : IClienteService
 {
-    private readonly List<Cliente> _clientes;
-    private int _nextId = 1;
+    private readonly IDatabaseService _databaseService;
 
-    public ClienteService()
+    public ClienteService(IDatabaseService databaseService)
     {
-        _clientes = new List<Cliente>();
-        
-        // Dados de exemplo para demonstração
-        _clientes.AddRange(new[]
-        {
-            new Cliente { Id = _nextId++, Name = "João", Lastname = "Silva", Age = 30, Address = "Rua A, 123" },
-            new Cliente { Id = _nextId++, Name = "Maria", Lastname = "Santos", Age = 25, Address = "Rua B, 456" },
-            new Cliente { Id = _nextId++, Name = "Pedro", Lastname = "Oliveira", Age = 35, Address = "Rua C, 789" }
-        });
+        _databaseService = databaseService;
     }
 
-    public async Task<IEnumerable<Cliente>> GetAllClientesAsync()
+    public async Task<ObservableCollection<Cliente>> GetAllClientesAsync()
     {
-        await Task.Delay(10); // Simula operação assíncrona
-        return _clientes.ToList();
+        try
+        {
+            await _databaseService.InitializeAsync();
+            var clientes = await _databaseService.GetAllClientesAsync();
+            return new ObservableCollection<Cliente>(clientes);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao buscar clientes: {ex.Message}", ex);
+        }
     }
 
     public async Task<Cliente?> GetClienteByIdAsync(int id)
     {
-        await Task.Delay(10);
-        return _clientes.FirstOrDefault(c => c.Id == id);
-    }
-
-    public async Task<Cliente> AddClienteAsync(Cliente cliente)
-    {
-        await Task.Delay(10);
-        cliente.Id = _nextId++;
-        _clientes.Add(cliente);
-        return cliente;
-    }
-
-    public async Task<Cliente> UpdateClienteAsync(Cliente cliente)
-    {
-        await Task.Delay(10);
-        var existingCliente = _clientes.FirstOrDefault(c => c.Id == cliente.Id);
-        if (existingCliente != null)
+        try
         {
-            existingCliente.Name = cliente.Name;
-            existingCliente.Lastname = cliente.Lastname;
-            existingCliente.Age = cliente.Age;
-            existingCliente.Address = cliente.Address;
+            var cliente = await _databaseService.GetClienteByIdAsync(id);
+            return cliente;
         }
-        return existingCliente ?? cliente;
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao buscar cliente por ID: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<bool> AddClienteAsync(Cliente cliente)
+    {
+        try
+        {
+            if (cliente == null)
+                throw new ArgumentNullException(nameof(cliente));
+
+            var result = await _databaseService.SaveClienteAsync(cliente);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao adicionar cliente: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<bool> UpdateClienteAsync(Cliente cliente)
+    {
+        try
+        {
+            if (cliente == null)
+                throw new ArgumentNullException(nameof(cliente));
+
+            var result = await _databaseService.SaveClienteAsync(cliente);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao atualizar cliente: {ex.Message}", ex);
+        }
     }
 
     public async Task<bool> DeleteClienteAsync(int id)
     {
-        await Task.Delay(10);
-        var cliente = _clientes.FirstOrDefault(c => c.Id == id);
-        if (cliente != null)
+        try
         {
-            _clientes.Remove(cliente);
-            return true;
+            var result = await _databaseService.DeleteClienteByIdAsync(id);
+            return result > 0;
         }
-        return false;
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao excluir cliente: {ex.Message}", ex);
+        }
     }
 }

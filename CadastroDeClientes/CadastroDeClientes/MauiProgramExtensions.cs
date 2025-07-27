@@ -18,6 +18,7 @@ namespace CadastroDeClientes
                 });
 
             // Registrar serviços
+            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
             builder.Services.AddSingleton<IClienteService, ClienteService>();
             
             // Registrar ViewModels

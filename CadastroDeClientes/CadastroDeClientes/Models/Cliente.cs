@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using SQLite;
 using System.Runtime.CompilerServices;
 
 namespace CadastroDeClientes.Models;
@@ -11,18 +12,21 @@ public class Cliente : INotifyPropertyChanged
     private int _age;
     private string _address = string.Empty;
 
+    [PrimaryKey, AutoIncrement]
     public int Id
     {
         get => _id;
         set => SetProperty(ref _id, value);
     }
 
+    [NotNull]
     public string Name
     {
         get => _name;
         set => SetProperty(ref _name, value);
     }
 
+    [NotNull]
     public string Lastname
     {
         get => _lastname;
@@ -35,6 +39,7 @@ public class Cliente : INotifyPropertyChanged
         set => SetProperty(ref _age, value);
     }
 
+    [NotNull]
     public string Address
     {
         get => _address;
