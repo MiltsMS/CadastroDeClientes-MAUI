@@ -1,5 +1,6 @@
 using CadastroDeClientes.Models;
 using CadastroDeClientes.Services;
+using CadastroDeClientes.Helpers;
 using System.Windows.Input;
 
 namespace CadastroDeClientes.ViewModels;
@@ -9,8 +10,19 @@ public class IncluirClienteViewModel : BaseViewModel
     private readonly IClienteService _clienteService;
     private string _name = string.Empty;
     private string _lastname = string.Empty;
-    private string _age = string.Empty;
+    private string _ageText = string.Empty;
     private string _address = string.Empty;
+    
+    private string _nameError = string.Empty;
+    private string _lastnameError = string.Empty;
+    private string _ageError = string.Empty;
+    private string _addressError = string.Empty;
+    
+    private bool _nameTouched = false;
+    private bool _lastnameTouched = false;
+    private bool _ageTouched = false;
+    private bool _addressTouched = false;
+    private bool _formSubmitted = false;
 
     public IncluirClienteViewModel(IClienteService clienteService)
     {
@@ -27,6 +39,7 @@ public class IncluirClienteViewModel : BaseViewModel
         set
         {
             SetProperty(ref _name, value);
+            ValidateName();
             ((RelayCommand)SalvarCommand).RaiseCanExecuteChanged();
         }
     }
@@ -37,16 +50,18 @@ public class IncluirClienteViewModel : BaseViewModel
         set
         {
             SetProperty(ref _lastname, value);
+            ValidateLastname();
             ((RelayCommand)SalvarCommand).RaiseCanExecuteChanged();
         }
     }
 
     public string Age
     {
-        get => _age;
+        get => _ageText;
         set
         {
-            SetProperty(ref _age, value);
+            SetProperty(ref _ageText, value);
+            ValidateAge();
             ((RelayCommand)SalvarCommand).RaiseCanExecuteChanged();
         }
     }
@@ -57,25 +72,120 @@ public class IncluirClienteViewModel : BaseViewModel
         set
         {
             SetProperty(ref _address, value);
+            ValidateAddress();
             ((RelayCommand)SalvarCommand).RaiseCanExecuteChanged();
         }
     }
 
+    public string NameError
+    {
+        get => _nameError;
+        set => SetProperty(ref _nameError, value);
+    }
+
+    public string LastnameError
+    {
+        get => _lastnameError;
+        set => SetProperty(ref _lastnameError, value);
+    }
+
+    public string AgeError
+    {
+        get => _ageError;
+        set => SetProperty(ref _ageError, value);
+    }
+
+    public string AddressError
+    {
+        get => _addressError;
+        set => SetProperty(ref _addressError, value);
+    }
+
     public ICommand SalvarCommand { get; }
     public ICommand CancelarCommand { get; }
+    
+    // Métodos para marcar campos como "tocados" quando o usuário interagir
+    public void OnNameUnfocused()
+    {
+        _nameTouched = true;
+        ValidateName();
+    }
+    
+    public void OnLastnameUnfocused()
+    {
+        _lastnameTouched = true;
+        ValidateLastname();
+    }
+    
+    public void OnAgeUnfocused()
+    {
+        _ageTouched = true;
+        ValidateAge();
+    }
+    
+    public void OnAddressUnfocused()
+    {
+        _addressTouched = true;
+        ValidateAddress();
+    }
+
+    private void ValidateName(bool forceShow = false)
+    {
+        var result = ValidationHelper.ValidateName(Name);
+        var shouldShow = forceShow || _formSubmitted || _nameTouched;
+        NameError = shouldShow && !result.IsValid ? result.ErrorMessage : string.Empty;
+    }
+
+    private void ValidateLastname(bool forceShow = false)
+    {
+        var result = ValidationHelper.ValidateLastname(Lastname);
+        var shouldShow = forceShow || _formSubmitted || _lastnameTouched;
+        LastnameError = shouldShow && !result.IsValid ? result.ErrorMessage : string.Empty;
+    }
+
+    private void ValidateAge(bool forceShow = false)
+    {
+        var result = ValidationHelper.ValidateAge(Age);
+        var shouldShow = forceShow || _formSubmitted || _ageTouched;
+        AgeError = shouldShow && !result.IsValid ? result.ErrorMessage : string.Empty;
+    }
+
+    private void ValidateAddress(bool forceShow = false)
+    {
+        var result = ValidationHelper.ValidateAddress(Address);
+        var shouldShow = forceShow || _formSubmitted || _addressTouched;
+        AddressError = shouldShow && !result.IsValid ? result.ErrorMessage : string.Empty;
+    }
 
     private bool CanSalvar()
     {
-        return !string.IsNullOrWhiteSpace(Name) &&
-               !string.IsNullOrWhiteSpace(Lastname) &&
-               !string.IsNullOrWhiteSpace(Age) &&
-               int.TryParse(Age, out var idade) && idade > 0 &&
-               !string.IsNullOrWhiteSpace(Address);
+        var nameValid = ValidationHelper.ValidateName(Name).IsValid;
+        var lastnameValid = ValidationHelper.ValidateLastname(Lastname).IsValid;
+        var ageValid = ValidationHelper.ValidateAge(Age).IsValid;
+        var addressValid = ValidationHelper.ValidateAddress(Address).IsValid;
+
+        return nameValid && lastnameValid && ageValid && addressValid;
     }
 
     private async Task SalvarCliente()
     {
         if (IsBusy) return;
+
+        // Marcar formulário como submetido para mostrar todas as validações
+        _formSubmitted = true;
+        
+        // Forçar validação de todos os campos
+        ValidateName(true);
+        ValidateLastname(true);
+        ValidateAge(true);
+        ValidateAddress(true);
+        
+        // Verificar se há erros de validação
+        if (!CanSalvar())
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Erro", "Por favor, corrija os erros antes de salvar.", "OK");
+            return;
+        }
 
         try
         {
