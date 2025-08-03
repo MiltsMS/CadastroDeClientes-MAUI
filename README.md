@@ -243,7 +243,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## Autor
 
-**Milton Santos** - [GitHub](https://github.com/MiltsMS)
+**Milton M. Soares** - [GitHub](https://github.com/MiltsMS)
 
 ---
 
